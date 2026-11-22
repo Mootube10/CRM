@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusHub — Unified CRM, HR & 1-Click Voice Router</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand"><span>OPS</span> NexusHub</div>
+      <button class="nav-btn active" onclick="switchTab('workspace', this)">Live Workspace</button>
+      <button class="nav-btn" onclick="switchTab('tickets', this)">Tickets & 1-Click Route</button>
+      <button class="nav-btn" onclick="switchTab('clients', this)">Client Directory</button>
+      <button class="nav-btn" onclick="switchTab('logs', this)">Unified Audit Logs</button>
+    </div>
+
+    <div class="demo-box">
+      <p><strong>Pitch Demo Simulator</strong><br>Test how your phone line connects to CRM & HR presence.</p>
+      <button class="btn btn-primary full-width" onclick="simulateIncomingCall()">Simulate Incoming Call</button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">Live Workspace</h2>
+        <p class="subtitle">Unified CRM, Staff Presence & Phoneline Router</p>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="status-pill">
+          <span class="dot" id="myStatusDot"></span>
+          <span id="myStatusText">Signed Out (Off-Site)</span>
+        </div>
+        <button class="btn btn-success" id="checkInBtn" onclick="toggleOfficeSignIn()">Sign Into Office</button>
+      </div>
+    </div>
+
+    <!-- Active Call + 1-Click Transfer Bar -->
+    <div class="call-banner" id="callBanner">
+      <div class="call-header">
+        <div>
+          <span class="badge badge-in banner-badge">LIVE PHONELINE CONNECTED</span>
+          <h3 id="callerName" class="caller-title">Incoming Call: Sarah Jenkins (Oakridge Academy)</h3>
+          <p id="callerContext" class="caller-context">
+            Active Ticket #1042: "Wi-Fi Dropouts in Science Block" • Account Tier: Priority
+          </p>
+        </div>
+        <button class="btn btn-danger" onclick="endCall()">End Call</button>
+      </div>
+
+      <div class="transfer-section">
+        <p class="transfer-label">1-CLICK TRANSFER (Moves Live Call + Open Ticket Together):</p>
+        <div class="transfer-grid" id="transferTargets"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 1: LIVE WORKSPACE -->
+    <section id="workspace" class="view-section active">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <h3>Open Tickets <span class="card-hint">1-Click Reassign</span></h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client</th>
+                  <th>Issue</th>
+                  <th>Assigned To</th>
+                  <th>1-Click Route</th>
+                </tr>
+              </thead>
+              <tbody id="workspaceTicketsTable"></tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h3>Recent Activity & Phoneline Logs</h3>
+            <div id="workspaceLogsList"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Staff Office Presence <span class="card-hint">Live Routing Pool</span></h3>
+            <div id="staffPresenceList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: TICKETS -->
+    <section id="tickets" class="view-section">
+      <div class="card">
+        <h3>All Support Tickets</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ticket</th>
+              <th>Client</th>
+              <th>Subject</th>
+              <th>Status</th>
+              <th>Owner</th>
+              <th>Quick Action</th>
+            </tr>
+          </thead>
+          <tbody id="fullTicketsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 3: CLIENT DIRECTORY -->
+    <section id="clients" class="view-section">
+      <div class="card">
+        <h3>Client Records (Linked to Phoneline Caller ID)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Client / Org</th>
+              <th>Primary Contact</th>
+              <th>Caller ID Number</th>
+              <th>Open Tickets</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 4: UNIFIED LOGS -->
+    <section id="logs" class="view-section">
+      <div class="card">
+        <h3>Complete System Audit Trail (HR + CRM + Calls)</h3>
+        <div id="fullLogsList"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">Action completed</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
