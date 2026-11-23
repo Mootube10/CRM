@@ -11,16 +11,18 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div>
-      <div class="brand"><span>OPS</span> NexusHub</div>
+      <div class="brand"><span>OPS</span> <strong id="brandOrgName">NexusHub</strong></div>
       <button class="nav-btn active" onclick="switchTab('workspace', this)">Live Workspace</button>
-      <button class="nav-btn" onclick="switchTab('tickets', this)">Tickets & 1-Click Route</button>
+      <button class="nav-btn" onclick="switchTab('tickets', this)">Tickets & Email Inbox</button>
       <button class="nav-btn" onclick="switchTab('clients', this)">Client Directory</button>
       <button class="nav-btn" onclick="switchTab('logs', this)">Unified Audit Logs</button>
+      <button class="nav-btn" onclick="switchTab('settings', this)">Installation & Email Settings</button>
     </div>
 
     <div class="demo-box">
-      <p><strong>Pitch Demo Simulator</strong><br>Test how your phone line connects to CRM & HR presence.</p>
-      <button class="btn btn-primary full-width" onclick="simulateIncomingCall()">Simulate Incoming Call</button>
+      <p><strong>Live Pitch Simulators</strong><br>Test inbound calls & emails linked to your CRM & HR presence.</p>
+      <button class="btn btn-primary full-width" style="margin-bottom:8px;" onclick="simulateIncomingCall()">Simulate Incoming Call</button>
+      <button class="btn btn-outline full-width" onclick="simulateIncomingEmail()">Simulate Incoming Email</button>
     </div>
   </aside>
 
@@ -29,7 +31,7 @@
     <div class="topbar">
       <div>
         <h2 id="pageTitle">Live Workspace</h2>
-        <p class="subtitle">Unified CRM, Staff Presence & Phoneline Router</p>
+        <p class="subtitle">Unified CRM, Staff Presence, Email Desk & Phoneline Router</p>
       </div>
 
       <div class="topbar-actions">
@@ -46,12 +48,13 @@
       <div class="call-header">
         <div>
           <span class="badge badge-in banner-badge">LIVE PHONELINE CONNECTED</span>
-          <h3 id="callerName" class="caller-title">Incoming Call: Sarah Jenkins (Oakridge Academy)</h3>
-          <p id="callerContext" class="caller-context">
-            Active Ticket #1042: "Wi-Fi Dropouts in Science Block" • Account Tier: Priority
-          </p>
+          <h3 id="callerName" class="caller-title">Incoming Call</h3>
+          <p id="callerContext" class="caller-context">Caller ID matched</p>
         </div>
-        <button class="btn btn-danger" onclick="endCall()">End Call</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline" id="openCallTicketBtn" onclick="openActiveCallTicket()">Open Linked Ticket</button>
+          <button class="btn btn-danger" onclick="endCall()">End Call</button>
+        </div>
       </div>
 
       <div class="transfer-section">
@@ -65,15 +68,18 @@
       <div class="grid-2">
         <div>
           <div class="card">
-            <h3>Open Tickets <span class="card-hint">1-Click Reassign</span></h3>
+            <h3>
+              Open Tickets & Email Threads
+              <button class="btn btn-primary btn-sm" onclick="openModal('newTicketModal')">+ New Ticket</button>
+            </h3>
             <table>
               <thead>
                 <tr>
                   <th>ID</th>
                   <th>Client</th>
-                  <th>Issue</th>
-                  <th>Assigned To</th>
-                  <th>1-Click Route</th>
+                  <th>Subject</th>
+                  <th>Owner</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="workspaceTicketsTable"></tbody>
@@ -81,7 +87,7 @@
           </div>
 
           <div class="card">
-            <h3>Recent Activity & Phoneline Logs</h3>
+            <h3>Recent Activity, Email & Phoneline Logs</h3>
             <div id="workspaceLogsList"></div>
           </div>
         </div>
@@ -95,10 +101,13 @@
       </div>
     </section>
 
-    <!-- VIEW 2: TICKETS -->
+    <!-- VIEW 2: TICKETS & EMAIL INBOX -->
     <section id="tickets" class="view-section">
       <div class="card">
-        <h3>All Support Tickets</h3>
+        <h3>
+          All Support Tickets & Email Threads
+          <button class="btn btn-primary btn-sm" onclick="openModal('newTicketModal')">+ New Ticket</button>
+        </h3>
         <table>
           <thead>
             <tr>
@@ -107,7 +116,7 @@
               <th>Subject</th>
               <th>Status</th>
               <th>Owner</th>
-              <th>Quick Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="fullTicketsTable"></tbody>
@@ -118,15 +127,18 @@
     <!-- VIEW 3: CLIENT DIRECTORY -->
     <section id="clients" class="view-section">
       <div class="card">
-        <h3>Client Records (Linked to Phoneline Caller ID)</h3>
+        <h3>
+          Client Records (Linked to Caller ID & Support Email)
+          <button class="btn btn-primary btn-sm" onclick="openModal('newClientModal')">+ Add Client</button>
+        </h3>
         <table>
           <thead>
             <tr>
               <th>Client / Org</th>
               <th>Primary Contact</th>
-              <th>Caller ID Number</th>
-              <th>Open Tickets</th>
-              <th>Action</th>
+              <th>Email</th>
+              <th>Caller ID</th>
+              <th>Test</th>
             </tr>
           </thead>
           <tbody id="clientsTable"></tbody>
@@ -137,11 +149,146 @@
     <!-- VIEW 4: UNIFIED LOGS -->
     <section id="logs" class="view-section">
       <div class="card">
-        <h3>Complete System Audit Trail (HR + CRM + Calls)</h3>
+        <h3>Complete System Audit Trail (HR + CRM + Emails + Calls)</h3>
         <div id="fullLogsList"></div>
       </div>
     </section>
+
+    <!-- VIEW 5: INSTALLATION & EMAIL SETTINGS -->
+    <section id="settings" class="view-section">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Installation & Outbound Email Template Setup</h3>
+          <p class="subtitle" style="margin-bottom:16px;">
+            Customize the support email address and template used for all outbound ticket replies during installation. Changes save automatically to this deployment.
+          </p>
+
+          <div class="form-group">
+            <label>Organization / Helpdesk Name</label>
+            <input type="text" id="setOrgName" placeholder="e.g., Oakridge IT Helpdesk" />
+          </div>
+
+          <div class="form-group">
+            <label>Outbound Support "Reply-From" Email Address</label>
+            <input type="email" id="setSupportEmail" placeholder="e.g., support@yourdomain.co.uk" />
+          </div>
+
+          <div class="form-group">
+            <label>Email Subject Prefix Format</label>
+            <input type="text" id="setSubjectFormat" placeholder="[{{ticket_id}}] Re: {{subject}}" />
+            <small class="hint-text">Available variables: <code>{{ticket_id}}</code>, <code>{{subject}}</code>, <code>{{client_name}}</code>, <code>{{org_name}}</code></small>
+          </div>
+
+          <div class="form-group">
+            <label>Default Email Reply Signature</label>
+            <textarea id="setSignature" rows="4" placeholder="Best regards,&#10;{{agent_name}}&#10;{{org_name}} ({{support_email}})"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Optional Mail Webhook / API Endpoint (For Live SMTP/Relay Integration)</label>
+            <input type="url" id="setWebhookUrl" placeholder="https://api.yourdomain.com/send-email (leave blank for local demo mode)" />
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button class="btn btn-primary" onclick="saveSettings()">Save Installation Settings</button>
+            <button class="btn btn-outline" onclick="resetDefaultSettings()">Reset Defaults</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Live Outbound Email Preview</h3>
+          <p class="subtitle" style="margin-bottom:14px;">Preview of how replies sent from tickets will appear to clients:</p>
+          <div class="email-preview-box" id="emailPreviewBox"></div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <!-- SLIDE-OVER TICKET & EMAIL THREAD DRAWER -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeTicketDrawer()"></div>
+  <aside class="ticket-drawer" id="ticketDrawer">
+    <div class="drawer-header">
+      <div>
+        <span class="badge badge-open" id="drawerStatusBadge">Open</span>
+        <h3 id="drawerTicketTitle" style="margin-top:6px;">#1042 — Subject</h3>
+        <p id="drawerTicketMeta" class="subtitle">Client • Owner</p>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-outline btn-sm" id="drawerResolveBtn" onclick="toggleTicketStatus()">Mark Resolved</button>
+        <button class="btn btn-outline btn-sm" onclick="closeTicketDrawer()">✕</button>
+      </div>
+    </div>
+
+    <div class="drawer-route-bar">
+      <span style="font-size:0.8rem; color:var(--muted);">1-Click Reassign:</span>
+      <div id="drawerRouteTargets" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="thread-container" id="drawerThreadList"></div>
+
+    <div class="composer-box">
+      <div class="composer-from">
+        Sending from: <strong id="composerFromDisplay">support@nexushub.local</strong> → To: <strong id="composerToDisplay">client@domain.com</strong>
+      </div>
+      <textarea id="replyInput" rows="3" placeholder="Type your email reply to the client..."></textarea>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <label style="font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="internalNoteCheck" /> Internal staff note only (do not email client)
+        </label>
+        <button class="btn btn-primary btn-sm" onclick="sendTicketReply()">Send Email Reply</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MODAL: NEW TICKET -->
+  <div class="modal" id="newTicketModal">
+    <div class="modal-card">
+      <h3>Create New Support Ticket</h3>
+      <div class="form-group">
+        <label>Select Client</label>
+        <select id="newTicketClient"></select>
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="newTicketSubject" placeholder="e.g., Projector HDMI port broken in Room 12" />
+      </div>
+      <div class="form-group">
+        <label>Initial Description / Message</label>
+        <textarea id="newTicketBody" rows="3" placeholder="Details of the request..."></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-outline" onclick="closeModal('newTicketModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createNewTicket()">Create Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD CLIENT -->
+  <div class="modal" id="newClientModal">
+    <div class="modal-card">
+      <h3>Add New Client / Department</h3>
+      <div class="form-group">
+        <label>Organization / Department Name</label>
+        <input type="text" id="newClientOrg" placeholder="e.g., St. Jude's Sixth Form" />
+      </div>
+      <div class="form-group">
+        <label>Primary Contact Name</label>
+        <input type="text" id="newClientContact" placeholder="e.g., Mr. Gareth Davies" />
+      </div>
+      <div class="form-group">
+        <label>Contact Email (Auto-links incoming emails)</label>
+        <input type="email" id="newClientEmail" placeholder="e.g., g.davies@stjudes.sch.uk" />
+      </div>
+      <div class="form-group">
+        <label>Caller ID Phone Number (Auto-links incoming calls)</label>
+        <input type="text" id="newClientPhone" placeholder="e.g., +44 121 496 0777" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-outline" onclick="closeModal('newClientModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createNewClient()">Save Client</button>
+      </div>
+    </div>
+  </div>
 
   <div class="toast" id="toast">Action completed</div>
 
